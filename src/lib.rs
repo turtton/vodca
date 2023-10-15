@@ -1,6 +1,6 @@
-use proc_macro::{TokenStream};
+use proc_macro::TokenStream;
 use quote::quote;
-use syn::{Data, DataStruct, DeriveInput, Fields, FieldsNamed, FieldsUnnamed, parse_macro_input};
+use syn::{parse_macro_input, Data, DataStruct, DeriveInput, Fields, FieldsNamed, FieldsUnnamed};
 
 #[proc_macro_derive(Fromln)]
 pub fn derive_fromln(input: TokenStream) -> TokenStream {
@@ -16,9 +16,9 @@ pub fn derive_fromln(input: TokenStream) -> TokenStream {
                 value.0
             }
         }
-    }.into()
+    }
+    .into()
 }
-
 
 #[proc_macro_derive(AsRefln)]
 pub fn derive_asrefln(input: TokenStream) -> TokenStream {
@@ -34,12 +34,18 @@ pub fn derive_asrefln(input: TokenStream) -> TokenStream {
                 &self.0
             }
         }
-    }.into()
+    }
+    .into()
 }
 
 fn get_field_type(data: &Data) -> proc_macro2::TokenStream {
-    if let Data::Struct(DataStruct { fields: Fields::Unnamed(FieldsUnnamed { ref unnamed, .. }), ..}) = data {
-        let ty = &unnamed.first()
+    if let Data::Struct(DataStruct {
+        fields: Fields::Unnamed(FieldsUnnamed { ref unnamed, .. }),
+        ..
+    }) = data
+    {
+        let ty = &unnamed
+            .first()
             .expect("Tuple struct must have at least one field")
             .ty;
         quote! {
@@ -55,7 +61,11 @@ pub fn derive_references(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as DeriveInput);
     let name = &ast.ident;
 
-    let fields = if let Data::Struct(DataStruct { fields: Fields::Named(FieldsNamed { ref named, .. }), .. }) = ast.data {
+    let fields = if let Data::Struct(DataStruct {
+        fields: Fields::Named(FieldsNamed { ref named, .. }),
+        ..
+    }) = ast.data
+    {
         named
     } else {
         unimplemented!("Only normal structs are supported")
@@ -74,5 +84,6 @@ pub fn derive_references(input: TokenStream) -> TokenStream {
         impl #name {
             #(#field_refs)*
         }
-    }.into()
+    }
+    .into()
 }

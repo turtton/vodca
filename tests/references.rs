@@ -6,14 +6,14 @@ use vodca::References;
 pub struct Struct {
     field_i32: i32,
     field_string: String,
-    field_vec: Vec<i32>
+    field_vec: Vec<i32>,
 }
 
 fn main() {
     let s = Struct {
         field_i32: 42,
         field_string: "Hello, world!".to_string(),
-        field_vec: vec![1, 2, 3]
+        field_vec: vec![1, 2, 3],
     };
 
     let i32 = s.field_i32();

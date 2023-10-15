@@ -6,7 +6,6 @@ use vodca::AsRefln;
 #[derive(AsRefln)]
 pub struct TupleStructI32(i32);
 
-
 #[derive(AsRefln)]
 pub struct TupleStructString(String);
 
