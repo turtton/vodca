@@ -1,0 +1,25 @@
+[package]
+name = "vodca"
+version = "0.1.0"
+edition = "2021"
+authors = ["turtton <top.gear7509@turtton.net>"]
+license = "MIT"
+description = "Reduce boilerplate when writing DDD codes"
+repository = "https://github.com/turtton/vodca"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+proc-macro = true
+
+[[test]]
+name = "test"
+path = "tests/parse_test.rs"
+
+[dev-dependencies]
+trybuild = "1.0"
+
+[dependencies]
+syn = { version = "2.0", features = ["extra-traits", "derive", "proc-macro"] }
+quote = "1.0"
+proc-macro2 = "1.0"
