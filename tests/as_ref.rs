@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 
+use std::marker::PhantomData;
 use vodca::AsRefln;
 
 #[derive(AsRefln)]
@@ -11,6 +12,9 @@ pub struct TupleStructString(String);
 
 #[derive(AsRefln)]
 pub struct TupleStructVec(Vec<i32>);
+
+#[derive(AsRefln)]
+pub struct TupleStructGenerics<T>(i32, PhantomData<T>);
 
 fn main() {
     let ts_i32 = TupleStructI32(42);
@@ -24,4 +28,8 @@ fn main() {
     let ts_vec = TupleStructVec(vec![1, 2, 3]);
     let vec: &[i32] = ts_vec.as_ref();
     assert_eq!(vec, &[1, 2, 3]);
+
+    let ts_generics = TupleStructGenerics::<()>(42, PhantomData);
+    let i32 = ts_generics.as_ref();
+    assert_eq!(i32, &42);
 }

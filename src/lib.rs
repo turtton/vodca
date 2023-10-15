@@ -7,10 +7,12 @@ pub fn derive_fromln(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as DeriveInput);
     let name = &ast.ident;
 
+    let (impl_generics, type_generics, _) = ast.generics.split_for_impl();
+
     let field_type = get_field_type(&ast.data);
     quote! {
-        impl From<#name> for #field_type {
-            fn from(value: #name) -> Self {
+        impl #impl_generics From<#name #type_generics> for #field_type {
+            fn from(value: #name #type_generics) -> Self {
                 value.0
             }
         }
@@ -23,10 +25,11 @@ pub fn derive_asrefln(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as DeriveInput);
     let name = &ast.ident;
 
+    let (impl_generics, type_generics, _) = ast.generics.split_for_impl();
     let field_type = get_field_type(&ast.data);
 
     quote! {
-        impl AsRef<#field_type> for #name {
+        impl #impl_generics AsRef<#field_type> for #name #type_generics {
             fn as_ref(&self) -> &#field_type {
                 &self.0
             }
