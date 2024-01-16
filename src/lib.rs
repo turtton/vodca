@@ -60,6 +60,7 @@ fn get_field_type(data: &Data) -> proc_macro2::TokenStream {
 pub fn derive_references(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as DeriveInput);
     let name = &ast.ident;
+    let generics = &ast.generics;
 
     let fields = if let Data::Struct(DataStruct {
         fields: Fields::Named(FieldsNamed { ref named, .. }),
@@ -81,7 +82,7 @@ pub fn derive_references(input: TokenStream) -> TokenStream {
         }
     });
     quote! {
-        impl #name {
+        impl #generics #name #generics {
             #(#field_refs)*
         }
     }
