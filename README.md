@@ -5,7 +5,6 @@
 
 vodca generates boiler-template codes in DDD
 
-
 ## ValueObject
 
 ### Fromln
@@ -22,6 +21,7 @@ impl From<TupleStruct> for String {
         value.0
     }
 }
+
 ///
 
 fn main() {
@@ -32,6 +32,7 @@ fn main() {
 ```
 
 ### AsRefln
+
 ```rust
 
 use vodca::AsRefln;
@@ -45,6 +46,7 @@ impl AsRef<String> for TupleStructString {
         &self.0
     }
 }
+
 ///
 
 fn main() {
@@ -57,6 +59,7 @@ fn main() {
 ## Entity
 
 ### References
+
 ```rust
 
 use vodca::References;
@@ -82,6 +85,7 @@ impl Struct {
         &self.field_vec
     }
 }
+
 ///
 
 fn main() {
