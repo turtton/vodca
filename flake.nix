@@ -10,7 +10,7 @@
       in
       {
         devShells.default = with pkgs; mkShell {
-          packages = [ bashInteractive rustup ];
+          packages = [ bashInteractive rustup cargo-deny ];
         };
       });
 }
