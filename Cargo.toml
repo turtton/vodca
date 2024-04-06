@@ -6,6 +6,8 @@ authors = ["turtton <top.gear7509@turtton.net>"]
 license = "MIT"
 description = "Reduce boilerplate when writing DDD codes"
 repository = "https://github.com/turtton/vodca"
+readme = "README.md"
+categories = ["development-tools::procedural-macro-helpers"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
