@@ -1,5 +1,8 @@
 # vodca
 
+[<img alt="crate.io" src="https://img.shields.io/crates/v/vodca?label=crate.io&logo=rust&style=flat-square">](https://crates.io/crates/vodca)
+[<img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/turtton/vodca/check.yml?style=flat-square">](https://github.com/turtton/vodca/actions/workflows/check.yml)
+
 vodca generates boiler-template codes in DDD
 
 
