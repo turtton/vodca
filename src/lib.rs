@@ -1,4 +1,5 @@
 use proc_macro::TokenStream;
+use proc_macro2::{Ident, Span};
 use quote::quote;
 use syn::{parse_macro_input, Data, DataStruct, DeriveInput, Fields, FieldsNamed, FieldsUnnamed};
 
@@ -36,6 +37,74 @@ pub fn derive_asrefln(input: TokenStream) -> TokenStream {
         }
     }
     .into()
+}
+
+#[proc_macro_derive(Newln)]
+pub fn derive_newln(input: TokenStream) -> TokenStream {
+    let ast = parse_macro_input!(input as DeriveInput);
+    let name = &ast.ident;
+    let generics = &ast.generics;
+
+    match ast.data {
+        Data::Struct(DataStruct {
+            fields: Fields::Named(FieldsNamed { ref named, .. }),
+            ..
+        }) => {
+            let fields = named;
+            let field_args = fields.iter().map(|field| {
+                let field_name = &field.ident;
+                let ty = &field.ty;
+                quote! {
+                    #field_name: #ty,
+                }
+            });
+            let field_names = fields.iter().map(|field| {
+                let field_name = &field.ident;
+                quote! {
+                    #field_name,
+                }
+            });
+            quote! {
+                impl #generics #name #generics {
+                    pub fn new(#(#field_args)*) -> Self {
+                        Self {
+                            #(#field_names)*
+                        }
+                    }
+                }
+            }
+            .into()
+        }
+        Data::Struct(DataStruct {
+            fields: Fields::Unnamed(FieldsUnnamed { ref unnamed, .. }),
+            ..
+        }) => {
+            let field_args = unnamed.iter().enumerate().map(|(i, field)| {
+                let field_name = Ident::new(&format!("value_{}", i), Span::call_site());
+                let ty = &field.ty;
+                quote! {
+                    #field_name: #ty,
+                }
+            });
+            let field_names = unnamed.iter().enumerate().map(|(i, _)| {
+                let field_name = Ident::new(&format!("value_{}", i), Span::call_site());
+                quote! {
+                    #field_name,
+                }
+            });
+            quote! {
+                impl #generics #name #generics {
+                    pub fn new(#(#field_args)*) -> Self {
+                        Self(
+                            #(#field_names)*
+                        )
+                    }
+                }
+            }
+            .into()
+        }
+        _ => unimplemented!("Only normal structs are supported"),
+    }
 }
 
 fn get_field_type(data: &Data) -> proc_macro2::TokenStream {
