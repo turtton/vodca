@@ -83,13 +83,13 @@ pub fn derive_newln(input: TokenStream) -> TokenStream {
                 let field_name = Ident::new(&format!("value_{}", i), Span::call_site());
                 let ty = &field.ty;
                 quote! {
-                    #field_name: #ty,
+                    #field_name: impl Into<#ty>,
                 }
             });
             let field_names = unnamed.iter().enumerate().map(|(i, _)| {
                 let field_name = Ident::new(&format!("value_{}", i), Span::call_site());
                 quote! {
-                    #field_name,
+                    #field_name.into(),
                 }
             });
             quote! {
