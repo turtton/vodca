@@ -1,7 +1,9 @@
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use quote::quote;
-use syn::{parse_macro_input, Data, DataStruct, DeriveInput, Fields, FieldsNamed, FieldsUnnamed};
+use syn::{
+    parse_macro_input, Data, DataEnum, DataStruct, DeriveInput, Fields, FieldsNamed, FieldsUnnamed,
+};
 
 #[proc_macro_derive(Fromln)]
 pub fn derive_fromln(input: TokenStream) -> TokenStream {
@@ -153,6 +155,33 @@ pub fn derive_references(input: TokenStream) -> TokenStream {
     quote! {
         impl #generics #name #generics {
             #(#field_refs)*
+        }
+    }
+    .into()
+}
+
+#[proc_macro_derive(Nameln)]
+pub fn derive_name(input: TokenStream) -> TokenStream {
+    let ast = parse_macro_input!(input as DeriveInput);
+    let name = &ast.ident;
+    let generics = &ast.generics;
+
+    let names = match ast.data {
+        Data::Enum(DataEnum { variants, .. }) => variants.into_iter().map(|variant| {
+            let variant_name = format!("{}", &variant.ident);
+            quote! { #name::#variant => #variant_name }
+        }),
+        _ => unimplemented!("Only enums are supported"),
+    };
+    quote! {
+        impl #generics #name #generics {
+            #[allow(unused_variables, non_snake_case)]
+            pub fn name(&self) -> String {
+                let name = match self {
+                    #(#names,)*
+                };
+                name.to_string()
+            }
         }
     }
     .into()
