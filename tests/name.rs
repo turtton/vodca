@@ -3,6 +3,7 @@ use vodca::Nameln;
 #[derive(Nameln)]
 pub enum Enum<T> {
     I64 { id: i64 },
+    Option { option: Option<i64> },
     Generics(T),
     Deleted,
 }

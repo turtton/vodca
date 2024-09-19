@@ -168,8 +168,19 @@ pub fn derive_name(input: TokenStream) -> TokenStream {
 
     let names = match ast.data {
         Data::Enum(DataEnum { variants, .. }) => variants.into_iter().map(|variant| {
-            let variant_name = format!("{}", &variant.ident);
-            quote! { #name::#variant => #variant_name }
+            let ident = variant.ident;
+            let variant_name = format!("{}", &ident);
+            match variant.fields {
+                Fields::Named(_) => {
+                    quote! { #name::#ident { .. } => #variant_name }
+                }
+                Fields::Unnamed(_) => {
+                    quote! { #name::#ident(_) => #variant_name }
+                }
+                Fields::Unit => {
+                    quote! { #name::#ident => #variant_name }
+                }
+            }
         }),
         _ => unimplemented!("Only enums are supported"),
     };
