@@ -2,7 +2,8 @@ use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use quote::quote;
 use syn::{
-    parse_macro_input, Data, DataEnum, DataStruct, DeriveInput, Fields, FieldsNamed, FieldsUnnamed,
+    parse_macro_input, Data, DataEnum, DataStruct, DeriveInput, Expr, ExprLit, Fields, FieldsNamed,
+    FieldsUnnamed, Lit, Meta,
 };
 
 #[proc_macro_derive(Fromln)]
@@ -160,16 +161,72 @@ pub fn derive_references(input: TokenStream) -> TokenStream {
     .into()
 }
 
-#[proc_macro_derive(Nameln)]
+#[proc_macro_derive(Nameln, attributes(vodca))]
 pub fn derive_name(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as DeriveInput);
     let name = &ast.ident;
     let generics = &ast.generics;
+    let attrs = ast.attrs;
+    let mut snake_case = false;
+    let mut prefix: Option<String> = None;
+    for attr in &attrs {
+        if !attr.path().is_ident("vodca") {
+            continue;
+        }
+        // requires `#[vodca(...)]`
+        if let Meta::List(meta) = &attr.meta {
+            if meta.tokens.is_empty() {
+                continue;
+            }
+        }
 
+        attr.parse_nested_meta(|meta| {
+            // `#[vodca(snake_case)]`
+            if meta.path.is_ident("snake_case") {
+                snake_case = true;
+                return Ok(());
+            }
+            // `#[vodca(prefix = "...")]`
+            if meta.path.is_ident("prefix") {
+                let expr: Expr = meta.value()?.parse()?;
+                if let Expr::Lit(ExprLit {
+                    lit: Lit::Str(value),
+                    ..
+                }) = expr
+                {
+                    prefix = Some(value.value());
+                    return Ok(());
+                }
+            }
+            Err(meta.error("Unknown vodca attribute"))
+        })
+        .expect("Failed to parse vodca attribute");
+    }
     let names = match ast.data {
         Data::Enum(DataEnum { variants, .. }) => variants.into_iter().map(|variant| {
             let ident = variant.ident;
-            let variant_name = format!("{}", &ident);
+            let parsed_indent = if snake_case {
+                ident
+                    .to_string()
+                    .chars()
+                    .enumerate()
+                    .map(|(i, c)| {
+                        if i != 0 && c.is_uppercase() {
+                            format!("_{}", c.to_lowercase())
+                        } else {
+                            c.to_lowercase().to_string()
+                        }
+                    })
+                    .collect::<String>()
+            } else {
+                ident.to_string()
+            };
+
+            let variant_name = if let Some(prefix) = &prefix {
+                format!("{}_{}", prefix, parsed_indent)
+            } else {
+                format!("{}", parsed_indent)
+            };
             match variant.fields {
                 Fields::Named(_) => {
                     quote! { #name::#ident { .. } => #variant_name }
@@ -186,7 +243,6 @@ pub fn derive_name(input: TokenStream) -> TokenStream {
     };
     quote! {
         impl #generics #name #generics {
-            #[allow(unused_variables, non_snake_case)]
             pub fn name(&self) -> String {
                 let name = match self {
                     #(#names,)*
