@@ -1,6 +1,6 @@
 [package]
 name = "vodca"
-version = "0.1.5"
+version = "0.1.6"
 edition = "2021"
 authors = ["turtton <top.gear7509@turtton.net>"]
 license = "MIT"
