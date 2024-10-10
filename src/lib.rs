@@ -69,6 +69,7 @@ pub fn derive_newln(input: TokenStream) -> TokenStream {
             });
             quote! {
                 impl #generics #name #generics {
+                    #[allow(clippy::too_many_arguments)]
                     pub fn new(#(#field_args)*) -> Self {
                         Self {
                             #(#field_names)*
@@ -97,6 +98,7 @@ pub fn derive_newln(input: TokenStream) -> TokenStream {
             });
             quote! {
                 impl #generics #name #generics {
+                    #[allow(clippy::too_many_arguments)]
                     pub fn new(#(#field_args)*) -> Self {
                         Self(
                             #(#field_names)*
