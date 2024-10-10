@@ -227,7 +227,7 @@ pub fn derive_name(input: TokenStream) -> TokenStream {
             let variant_name = if let Some(prefix) = &prefix {
                 format!("{}_{}", prefix, parsed_indent)
             } else {
-                format!("{}", parsed_indent)
+                parsed_indent.to_string()
             };
             match variant.fields {
                 Fields::Named(_) => {
